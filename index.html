@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Nope Machine — say “no” in style</title>
+    <meta name="description" content="Generate a stylish and funny reason to say no. Copy it, share it, or save as an image.">
+    <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+
+<body>
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+
+<div class="topbar">
+    <div class="pill">
+        <span class="dot"></span>
+        <div>
+            <div class="brand">NOPE MACHINE</div>
+            <div class="tiny">a “no” generator you can easily share</div>
+        </div>
+    </div>
+
+    <div class="pill">
+        <div class="tiny">Powered by: No-as-a-Service</div>
+        <div class="tiny" id="apiStatus">●</div>
+    </div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<main class="wrap">
+    <section class="card" id="card">
+        <div class="inner">
+            <div>
+                <h1 class="title">Say “no” in style 😈</h1>
+                <p class="subtitle">
+                    Get a reason in the right tone. Copy it, share it, or save it as an image.
+                </p>
+            </div>
+
+            <div class="hero">
+                <div class="panel">
+                    <div class="stage">
+                        <div class="labelrow">
+                            <div>💬 Your reason</div>
+                            <div id="meta">Ready to say no</div>
+                        </div>
+
+                        <div class="stamp" id="stamp">NOPE</div>
+
+                        <p class="reason muted" id="reasonText">
+                            Click <b>«Give me a reason»</b> — and get a legendary “no, thanks.”
+                        </p>
+
+                        <div class="chips">
+<!--                            <span class="chip">🎛 mode: <b id="modeLabel">VIRAL</b></span>-->
+<!--                            <span class="chip">🎯 meme chance: <b id="memeChance">???</b></span>-->
+                            <span class="chip">🧪 status: <b id="statusLabel">idle</b></span>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="btn primary cta" id="btnNo">🚫 Give me an excuse</button>
+
+                        <div class="secondary-actions">
+                            <button class="btn ghost" id="btnCopy">📋 Copy</button>
+                            <button class="btn danger" id="btnImage">🖼 Save as image</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-visual">
+                    <svg
+                            class="watermark"
+                            id="watermark"
+                            viewBox="0 0 1000 400"
+                            aria-hidden="true"
+                    >
+                        <text x="50%" y="58%" text-anchor="middle">NOPE</text>
+                    </svg>
+                </div>
+                <!--                <div class="panel">-->
+<!--                    <div class="meme">-->
+<!--                        <h3>Мем-панель</h3>-->
+<!--                        <p id="memeHint">When your friend says “c’mon, just this once…”</p>-->
+<!--                        <div class="big-no" id="bigNo">NO</div>-->
+<!--                        <div class="boing" id="boing">*boing*</div>-->
+<!--                    </div>-->
+<!--                </div>-->
+            </div>
+
+            <div class="footer">
+                Tip: after generating, hit “Share” — it’s the best viral flow 😼
+            </div>
+        </div>
+    </section>
+</main>
+
+<div class="toast" id="toast">готово</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
