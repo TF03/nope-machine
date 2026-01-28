@@ -1,8 +1,9 @@
 export class PosterRenderer {
-    renderPng({ reason, mode }) {
+    renderPng({reason, mode}) {
         const w = 1080, h = 1080;
         const c = document.createElement("canvas");
-        c.width = w; c.height = h;
+        c.width = w;
+        c.height = h;
         const g = c.getContext("2d");
 
         const grd = g.createLinearGradient(0, 0, w, h);
@@ -68,7 +69,8 @@ export class PosterRenderer {
         g.lineWidth = 7;
         g.fillStyle = "rgba(251,113,133,.12)";
         roundRect(-160, -70, 320, 140, 28);
-        g.fill(); g.stroke();
+        g.fill();
+        g.stroke();
         g.fillStyle = "rgba(251,113,133,.92)";
         g.font = "1000 52px system-ui, -apple-system, Segoe UI, Roboto";
         g.textAlign = "center";

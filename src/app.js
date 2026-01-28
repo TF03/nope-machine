@@ -1,5 +1,5 @@
-import { MODES, MODE_LABELS } from "./config.js";
-import { randInt, chance } from "./utils.js";
+import {MODE_LABELS} from "./config.js";
+import {chance} from "./utils.js";
 
 export class App {
     /**
@@ -12,7 +12,7 @@ export class App {
      *  modes: import("./modes/modeEngine.js").ModeEngine
      * }} deps
      */
-    constructor({ dom, toast, confetti, poster, api, modes }) {
+    constructor({dom, toast, confetti, poster, api, modes}) {
         this.dom = dom;
         this.toast = toast;
         this.confetti = confetti;
@@ -22,6 +22,9 @@ export class App {
 
         this.lastReason = "";
         this.lastMode = "viral";
+
+        this._rmMql = window.matchMedia("(prefers-reduced-motion: reduce)");
+        this.reducedMotion = this._rmMql.matches;
     }
 
     async init() {
@@ -30,6 +33,10 @@ export class App {
 
         const ok = await this.api.ping();
         this._setApiStatus(ok);
+        this.confetti.target = this.dom.card;
+        this._rmMql.addEventListener?.("change", (e) => {
+            this.reducedMotion = e.matches;
+        });
     }
 
     _wireUi() {
@@ -90,12 +97,12 @@ export class App {
 
         this.dom.bigNo.animate(
             [
-                { transform: "scale(1) rotate(0deg)" },
-                { transform: "scale(1.08) rotate(-2deg)" },
-                { transform: "scale(0.98) rotate(1deg)" },
-                { transform: "scale(1) rotate(0deg)" },
+                {transform: "scale(1) rotate(0deg)"},
+                {transform: "scale(1.08) rotate(-2deg)"},
+                {transform: "scale(0.98) rotate(1deg)"},
+                {transform: "scale(1) rotate(0deg)"},
             ],
-            { duration: mode === "chaos" ? 520 : 420, easing: "cubic-bezier(.2,.9,.2,1)" }
+            {duration: mode === "chaos" ? 520 : 420, easing: "cubic-bezier(.2,.9,.2,1)"}
         );
     }
 
@@ -106,7 +113,7 @@ export class App {
         if (this.dom.meta) this.dom.meta.textContent = "crafting the perfect excuse…";
         this.dom.btnNo.disabled = true;
 
-        const { ok, reason } = await this.api.getReason();
+        const {ok, reason} = await this.api.getReason();
 
         this._setApiStatus(ok);
         this.dom.btnNo.disabled = false;
@@ -125,8 +132,10 @@ export class App {
         this._stampPop();
 
         const p = this.modes.memeProbability(mode);
-        if (chance(p)) {
-            // this.confetti.burst(mode === "chaos" ? "high" : "low");
+
+        const isMobile = window.matchMedia("(max-width: 860px)").matches;
+
+        if (!this.reducedMotion && !isMobile && chance(p)) {
             this.confetti.burst("low");
         }
 
@@ -137,13 +146,12 @@ export class App {
                 if (this.dom.watermark) this.dom.watermark.style.transform = "scale(1)";
             }, 450);
         }
-
-
     }
 
     async _onCopy() {
         if (!this.lastReason) return;
-        const payload = `🚫 NOPE (${MODE_LABELS[this.lastMode] ?? this.lastMode.toUpperCase()}): ${this.lastReason}`;
+        // const payload = `🚫 NOPE (${MODE_LABELS[this.lastMode] ?? this.lastMode.toUpperCase()}): ${this.lastReason}`;
+        const payload = `🚫 NOPE: ${this.lastReason}`;
 
         try {
             await navigator.clipboard.writeText(payload);
@@ -167,7 +175,7 @@ export class App {
 
         if (navigator.share) {
             try {
-                await navigator.share({ title: "NOPE — причина отказа", text, url });
+                await navigator.share({title: "NOPE — причина отказа", text, url});
                 this.toast.show("Sent 📤");
                 return;
             } catch {
@@ -185,7 +193,7 @@ export class App {
 
     _onSaveImage() {
         if (!this.lastReason) return;
-        const png = this.poster.renderPng({ reason: this.lastReason, mode: this.lastMode });
+        const png = this.poster.renderPng({reason: this.lastReason, mode: this.lastMode});
 
         const a = document.createElement("a");
         a.download = "nope.png";

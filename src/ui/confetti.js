@@ -8,6 +8,9 @@ export class Confetti {
         this.particles = [];
         this.raf = null;
 
+        /** @type {HTMLElement|null} */
+        this.target = null;
+
         this._resize = this._resize.bind(this);
         window.addEventListener("resize", this._resize);
         this._resize();
@@ -22,10 +25,17 @@ export class Confetti {
 
     burst(intensity = "low") {
         const count = intensity === "high" ? 170 : 90;
-        const cx = window.innerWidth / 2;
-        const cy = window.innerHeight / 2;
-        // const cx = window.innerWidth * (0.30 + Math.random() * 0.40);
-        // const cy = window.innerHeight * (0.22 + Math.random() * 0.20);
+
+        let cx = window.innerWidth / 2;
+        let cy = window.innerHeight / 2;
+
+        const palette = ["rgba(124,58,237,", "rgba(34,197,94,", "rgba(251,113,133,", "rgba(238,242,255,"];
+
+        if (this.target) {
+            const rect = this.target.getBoundingClientRect();
+            cx = rect.left + rect.width / 2;
+            cy = rect.top + rect.height / 2;
+        }
 
         for (let i = 0; i < count; i++) {
             this.particles.push({
@@ -37,6 +47,7 @@ export class Confetti {
                 a: 1,
                 rot: Math.random() * Math.PI,
                 vr: (Math.random() - 0.5) * 0.3,
+                col: palette[(Math.random() * palette.length) | 0],
             });
         }
         this._animate();
@@ -45,7 +56,21 @@ export class Confetti {
     _animate() {
         if (this.raf) return;
 
+        if (document.hidden) {
+            this.particles = [];
+            cancelAnimationFrame(this.raf);
+            this.raf = null;
+            return;
+        }
+
         const step = () => {
+            if (document.hidden) {
+                this.particles = [];
+                this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+                this.raf = null;
+                return;
+            }
+
             const ctx = this.ctx;
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
@@ -58,9 +83,7 @@ export class Confetti {
                 p.rot += p.vr;
                 p.a *= 0.985;
 
-                const palette = ["rgba(124,58,237,", "rgba(34,197,94,", "rgba(251,113,133,", "rgba(238,242,255,"];
-                const base = palette[(Math.random() * palette.length) | 0];
-                ctx.fillStyle = base + (p.a.toFixed(3)) + ")";
+                ctx.fillStyle = p.col + (p.a.toFixed(3)) + ")";
 
                 ctx.save();
                 ctx.translate(p.x, p.y);

@@ -25,7 +25,7 @@ export function getDom() {
 
         toast: el("toast"),
         confetti: el("confetti"),
-
+        
         watermark: el("watermark"),
     };
 }

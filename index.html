@@ -1,11 +1,27 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>Nope Machine — say “no” in style</title>
-    <meta name="description" content="Generate a stylish and funny reason to say no. Copy it, share it, or save as an image.">
-    <link rel="stylesheet" href="./assets/styles.css" />
+    <meta name="description" content="Generate a stylish and funny reason to say no. Copy it or save it as an image.">
+    <meta name="apple-mobile-web-app-title" content="Nope Machine"/>
+
+    <meta property="og:title" content="Nope Machine — stylish “No” reason generator">
+    <meta property="og:description"
+          content="Generate funny or stylish reasons to say no. Copy it or save it as an image.">
+    <meta property="og:image" content="https://tf03.github.io/nope-machine/assets/icons/social-preview.png">
+    <meta property="og:url" content="https://tf03.github.io/nope-machine/">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="stylesheet" href="./assets/styles.css"/>
+    <link rel="icon" href="./favicon.ico"/>
+    <link rel="icon" type="image/svg+xml" href="./assets/icons/favicon.svg"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/apple-touch-icon.png"/>
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/icons/favicon-16.png"/>
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png"/>
+    <link rel="icon" type="image/png" sizes="96x96" href="./assets/icons/favicon-96.png"/>
+    <link rel="manifest" href="/site.webmanifest">
 </head>
 
 <body>
@@ -22,7 +38,7 @@
         </div>
     </div>
 
-    <div class="pill">
+    <div class="pill pill--status">
         <div class="tiny">Powered by: No-as-a-Service</div>
         <div class="tiny" id="apiStatus">●</div>
     </div>
@@ -36,7 +52,7 @@
             <div>
                 <h1 class="title">Say “no” in style 😈</h1>
                 <p class="subtitle">
-                    Get a reason in the right tone. Copy it, share it, or save it as an image.
+                    Get a reason in the right tone. Copy it or save it as an image.
                 </p>
             </div>
 
@@ -51,18 +67,18 @@
                         <div class="stamp" id="stamp">NOPE</div>
 
                         <p class="reason muted" id="reasonText">
-                            Click <b>«Give me a reason»</b> — and get a legendary “no, thanks.”
+                            Click <b>“Give me a reason”</b> — and get a legendary “no, thanks.”
                         </p>
 
                         <div class="chips">
-<!--                            <span class="chip">🎛 mode: <b id="modeLabel">VIRAL</b></span>-->
-<!--                            <span class="chip">🎯 meme chance: <b id="memeChance">???</b></span>-->
+                            <!--                            <span class="chip">🎛 mode: <b id="modeLabel">VIRAL</b></span>-->
+                            <!--                            <span class="chip">🎯 meme chance: <b id="memeChance">???</b></span>-->
                             <span class="chip">🧪 status: <b id="statusLabel">idle</b></span>
                         </div>
                     </div>
 
                     <div class="controls">
-                        <button class="btn primary cta" id="btnNo">🚫 Give me an excuse</button>
+                        <button class="btn primary cta" id="btnNo">🚫 Give me a reason</button>
 
                         <div class="secondary-actions">
                             <button class="btn ghost" id="btnCopy">📋 Copy</button>
@@ -82,17 +98,17 @@
                     </svg>
                 </div>
                 <!--                <div class="panel">-->
-<!--                    <div class="meme">-->
-<!--                        <h3>Мем-панель</h3>-->
-<!--                        <p id="memeHint">When your friend says “c’mon, just this once…”</p>-->
-<!--                        <div class="big-no" id="bigNo">NO</div>-->
-<!--                        <div class="boing" id="boing">*boing*</div>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                    <div class="meme">-->
+                <!--                        <h3>Мем-панель</h3>-->
+                <!--                        <p id="memeHint">When your friend says “c’mon, just this once…”</p>-->
+                <!--                        <div class="big-no" id="bigNo">NO</div>-->
+                <!--                        <div class="boing" id="boing">*boing*</div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
             </div>
 
             <div class="footer">
-                Tip: after generating, hit “Share” — it’s the best viral flow 😼
+                Tip: generate, then copy or save as an image 😼
             </div>
         </div>
     </section>
