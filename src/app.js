@@ -1,5 +1,6 @@
 import {MODE_LABELS} from "./config.js";
 import {chance} from "./utils.js";
+import {copyText} from "./utils/copyText.js";
 
 export class App {
     /**
@@ -25,14 +26,31 @@ export class App {
 
         this._rmMql = window.matchMedia("(prefers-reduced-motion: reduce)");
         this.reducedMotion = this._rmMql.matches;
+
+        this.isGenerating = false;
+
+        this._mobileMql = window.matchMedia("(max-width: 860px)");
+        this.isMobile = this._mobileMql.matches;
+
+        this._stampT = null;
+        this._wmT = null;
+
+        this._mobileMql.addEventListener?.("change", (e) => {
+            this.isMobile = e.matches;
+        });
     }
 
     async init() {
         this._wireUi();
         // this._updateModeUi(this.dom.modeSelect.value);
 
-        const ok = await this.api.ping();
+        let ok = false;
+        try {
+            ok = await this.api.ping();
+        } catch {
+        }
         this._setApiStatus(ok);
+
         this.confetti.target = this.dom.card;
         this._rmMql.addEventListener?.("change", (e) => {
             this.reducedMotion = e.matches;
@@ -81,7 +99,9 @@ export class App {
         this.dom.stamp.classList.remove("show");
         void this.dom.stamp.offsetWidth;
         this.dom.stamp.classList.add("show");
-        setTimeout(() => this.dom.stamp.classList.remove("show"), 650);
+
+        clearTimeout(this._stampT);
+        this._stampT = setTimeout(() => this.dom.stamp.classList.remove("show"), 650);
     }
 
     _updateModeUi(mode) {
@@ -107,63 +127,74 @@ export class App {
     }
 
     async _onGenerate() {
-        // const mode = this.dom.modeSelect.value;
+        if (this.isGenerating) return;
+        this.isGenerating = true;
+        this._enableActions(false);
+
         const mode = "viral";
         this._setStatus("loading…");
         if (this.dom.meta) this.dom.meta.textContent = "crafting the perfect excuse…";
         this.dom.btnNo.disabled = true;
 
-        const {ok, reason} = await this.api.getReason();
+        try {
+            const {ok, reason} = await this.api.getReason();
 
-        this._setApiStatus(ok);
-        this.dom.btnNo.disabled = false;
+            this._setApiStatus(ok);
 
-        const finalText = this.modes.stylize(reason, mode);
-        this.lastReason = finalText;
+            const finalText = this.modes.stylize(reason, mode);
+            this.lastReason = finalText;
+            this.lastMode = mode;
 
-        this.dom.reasonText.classList.remove("muted");
-        this.dom.reasonText.textContent = finalText;
-        if (this.dom.meta) this.dom.meta.textContent = "done. now send it to a friend 😼";
-        this._enableActions(true);
+            this.dom.reasonText.classList.remove("muted");
+            this.dom.reasonText.textContent = finalText;
 
-        this._setStatus(ok ? "ok" : "fallback");
-        // this._updateModeUi(mode);
-        this._shake();
-        this._stampPop();
+            if (this.dom.meta) this.dom.meta.textContent = "done. now send it to a friend 😼";
 
-        const p = this.modes.memeProbability(mode);
+            this._enableActions(true);
 
-        const isMobile = window.matchMedia("(max-width: 860px)").matches;
+            this._track(ok ? "SuccessGenerateReason" : "FailedGenerateReason", {mode});
+            this._setStatus(ok ? "ok" : "fallback");
 
-        if (!this.reducedMotion && !isMobile && chance(p)) {
-            this.confetti.burst("low");
-        }
+            this._shake();
+            this._stampPop();
 
+            const p = this.modes.memeProbability(mode);
+            if (!this.reducedMotion && !this.isMobile && chance(p)) {
+                this.confetti.burst("low");
+                this._track("ConfettiBurst", {mode});
+            }
 
-        if (this.dom.watermark) {
-            this.dom.watermark.style.transform = "scale(1.4)";
-            setTimeout(() => {
-                if (this.dom.watermark) this.dom.watermark.style.transform = "scale(1)";
-            }, 450);
+            if (this.dom.watermark) {
+                this.dom.watermark.style.transform = "scale(1.4)";
+                clearTimeout(this._wmT);
+                this._wmT = setTimeout(() => {
+                    if (this.dom.watermark) this.dom.watermark.style.transform = "scale(1)";
+                }, 450);
+            }
+        } finally {
+            this.dom.btnNo.disabled = false;
+            this.isGenerating = false;
+            this._enableActions(Boolean(this.lastReason));
         }
     }
 
     async _onCopy() {
         if (!this.lastReason) return;
-        // const payload = `🚫 NOPE (${MODE_LABELS[this.lastMode] ?? this.lastMode.toUpperCase()}): ${this.lastReason}`;
         const payload = `🚫 NOPE: ${this.lastReason}`;
 
         try {
-            await navigator.clipboard.writeText(payload);
-            this.toast.show("Copied 📋");
+            const {method} = await copyText(payload);
+
+            if (method === "clipboard") {
+                this.toast.show("Copied 📋");
+            } else {
+                this.toast.show("Select text and press Ctrl/Cmd+C ✨");
+            }
+
+            this._track("CopyResult", {method});
         } catch {
-            const ta = document.createElement("textarea");
-            ta.value = payload;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand("copy");
-            ta.remove();
-            this.toast.show("Copied 📋");
+            this.toast.show("Couldn’t copy 😅");
+            this._track("CopyFailed");
         }
     }
 
@@ -177,17 +208,20 @@ export class App {
             try {
                 await navigator.share({title: "NOPE — причина отказа", text, url});
                 this.toast.show("Sent 📤");
+                this._track("SharedResult");
                 return;
             } catch {
-                // cancel or fail -> fallback
+                this._track("ShareFailed");
             }
         }
 
         try {
-            await navigator.clipboard.writeText(text + "\n\n" + url);
-            this.toast.show("Message copied ✨");
+            const {method} = await copyText(text + "\n\n" + url);
+            this.toast.show(method === "clipboard" ? "Message copied ✨" : "Select text and press Ctrl/Cmd+C ✨");
+            this._track("ShareFallbackCopy", {method});
         } catch {
             this.toast.show("Couldn’t share 😅");
+            this._track("ShareFallbackCopyFailed");
         }
     }
 
@@ -200,5 +234,13 @@ export class App {
         a.href = png;
         a.click();
         this.toast.show("Image saved 🖼️");
+        this._track("SavedImage");
+    }
+
+    _track(name, props) {
+        try {
+            window.plausible?.(name, props ? {props: {...props}} : undefined);
+        } catch {
+        }
     }
 }
